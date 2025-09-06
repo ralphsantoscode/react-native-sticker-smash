@@ -23,10 +23,14 @@ export default function Index() {
   const [showAppOptions, setShowAppOptions] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [pickedEmoji, setPickedEmoji] = useState<ImageSourcePropType | undefined>(undefined);
-  const [status, requestPermission] = MediaLibrary.usePermissions();
+  const [mediaPermission, requestPermission] = MediaLibrary.usePermissions();
 
-  if (status === null) {
+  if (!mediaPermission || mediaPermission.canAskAgain) {
     requestPermission();
+  } else if (mediaPermission.status === 'denied') {
+    alert('Permission to access media library was denied. Please go to settings and grant permission.');
+  } else if (mediaPermission.status === 'granted') {
+    console.log('Permission to access media library was granted');
   }
 
   const pickImageAsync = async () => {
