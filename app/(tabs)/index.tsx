@@ -26,15 +26,17 @@ export default function Index() {
   const [pickedEmoji, setPickedEmoji] = useState<ImageSourcePropType | undefined>(undefined);
   const [mediaPermission, requestPermission] = MediaLibrary.usePermissions();
 
-  if (!mediaPermission || mediaPermission.canAskAgain) {
+  if (mediaPermission === null) {
     requestPermission();
-  } else if (mediaPermission.status === 'denied') {
-    alert('Permission to access media library was denied. Please go to settings and grant permission.');
-  } else if (mediaPermission.status === 'granted') {
-    console.log('Permission to access media library was granted');
-  }
+  } 
 
   const pickImageAsync = async () => {
+    if (!mediaPermission || mediaPermission.canAskAgain) {
+      await requestPermission();
+    } else if (mediaPermission.status === 'denied' && !mediaPermission.canAskAgain) {
+      alert('Permission to access media library was denied. Please go to settings and grant permission.');
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
